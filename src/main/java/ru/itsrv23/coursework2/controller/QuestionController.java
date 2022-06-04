@@ -41,9 +41,9 @@ public class QuestionController {
 
     // Дописать через patch
 
-    @DeleteMapping
-    public void removeQuestion(@RequestBody QuestionRequestDTO requestDTO){
-        questionService.removeQuestion(requestDTO);
+    @DeleteMapping({"{id}"})
+    public void removeQuestion(@PathVariable Long id){
+        questionService.removeQuestion(id);
     }
 
 }

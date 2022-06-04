@@ -78,17 +78,21 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionResponseDTO findQuestionById(Long id) {
-        return new QuestionResponseDTO(
-                questionRepository.findById(id)
-                        .orElseThrow(() -> new NotFoundQuestionException
-                                (String.format("Question with id %d not found",  id))
-                        )
-        );
+
+        Question question = questionRepository.findById(id).orElseThrow(() -> new NotFoundQuestionException
+                (String.format("Question with id %d not found", id)));
+
+        if (question.isDeleted()){
+            throw new NotFoundQuestionException
+                    (String.format("Question with id %d not found. Is Deleted", id));
+        }
+
+        return new QuestionResponseDTO(question);
     }
 
     @Override
-    public void removeQuestion(QuestionRequestDTO requestDTO) {
-        questionRepository.deleteById(requestDTO.getId());
+    public void removeQuestion(Long id) {
+        questionRepository.deleteById(id);
     }
 
     protected Question newQuestion(QuestionRequestDTO requestDTO){

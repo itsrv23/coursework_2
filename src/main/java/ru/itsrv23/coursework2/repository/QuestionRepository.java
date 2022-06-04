@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository <Question, Long> {
     List<Question> findByExamId(Long examId);
+    Optional<Question> findById(Long id);
     List<Question> findAll();
     List<Question> findAllByDeletedFalse();
     Optional<Question> findFirstByExamAndQuestionAndAnswer(Exam exam, String question, String answer);

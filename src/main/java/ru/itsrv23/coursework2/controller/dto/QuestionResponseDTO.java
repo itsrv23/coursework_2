@@ -2,6 +2,8 @@ package ru.itsrv23.coursework2.controller.dto;
 
 import ru.itsrv23.coursework2.model.Question;
 
+import java.util.Objects;
+
 public class QuestionResponseDTO {
     private Long id;
     private String question;
@@ -66,6 +68,19 @@ public class QuestionResponseDTO {
 
     public void setExamName(String examName) {
         this.examName = examName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        QuestionResponseDTO that = (QuestionResponseDTO) o;
+        return Objects.equals(id, that.id) && Objects.equals(question, that.question) && Objects.equals(answer, that.answer) && Objects.equals(examId, that.examId) && Objects.equals(examName, that.examName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, question, answer, examId, examName);
     }
 
     @Override

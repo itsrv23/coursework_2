@@ -18,6 +18,8 @@ public class ExamController {
         this.examService = examService;
     }
 
+
+
     @GetMapping("/get")
     public List<Exam> findExam() {
         return examService.findAllExam();

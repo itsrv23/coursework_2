@@ -11,6 +11,6 @@ public interface QuestionService {
     QuestionResponseDTO addQuestion(QuestionRequestDTO question);
     QuestionResponseDTO patchQuestion(QuestionRequestDTO question);
     QuestionResponseDTO findQuestionById(Long id);
-    void removeQuestion(QuestionRequestDTO question);
+    void removeQuestion(Long id);
 
 }

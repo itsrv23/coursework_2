@@ -10,6 +10,7 @@ import ru.itsrv23.coursework2.repository.ExamRepository;
 import ru.itsrv23.coursework2.repository.QuestionRepository;
 import ru.itsrv23.coursework2.service.QuestionService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,7 +31,9 @@ public class QuestionServiceMultiExamImpl extends QuestionServiceImpl implements
         if (amount <= 0) {
             throw new IllegalArgumentException("Число вопросов должно от 1 и более");
         }
+        // Данная имплементация ищет вопросы по всем экзаменам
         List<Question> allByExam = questionRepository.findAllByDeletedFalse();
+        Collections.shuffle(allByExam);
 
         return allByExam.stream()
                 .limit(amount)
@@ -39,8 +42,8 @@ public class QuestionServiceMultiExamImpl extends QuestionServiceImpl implements
     }
 
     @Override
-    public void removeQuestion(QuestionRequestDTO requestDTO) {
-        Question question = questionRepository.findById(requestDTO.getId()).orElseThrow(NotFoundQuestionException::new);
+    public void removeQuestion(Long id) {
+        Question question = questionRepository.findById(id).orElseThrow(NotFoundQuestionException::new);
         question.setDeleted(true);
         questionRepository.save(question);
     }
