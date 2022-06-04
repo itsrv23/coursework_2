@@ -1,28 +1,24 @@
 package ru.itsrv23.coursework2.controller;
 
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.itsrv23.coursework2.model.Exam;
 import ru.itsrv23.coursework2.repository.ExamRepository;
-import ru.itsrv23.coursework2.service.ExamService;
 import ru.itsrv23.coursework2.service.impl.ExamServiceImpl;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 @WebMvcTest(controllers = ExamController.class)
 class ExamControllerTest {
@@ -51,9 +47,15 @@ class ExamControllerTest {
 
         when(examRepository.findAll()).thenReturn(List.of(exam));
 
-        mockMvc.perform(get("/exam/get"))
+        mockMvc.perform(get("/exam/get")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
                 .andDo(print())
-                .andExpect(status().is2xxSuccessful());
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].id").value(examId))
+                .andExpect(jsonPath("$[0].name").value(examName));
     }
 
     @Test

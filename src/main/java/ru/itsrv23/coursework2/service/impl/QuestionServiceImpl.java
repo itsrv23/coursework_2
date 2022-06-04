@@ -6,6 +6,7 @@ import ru.itsrv23.coursework2.controller.dto.QuestionResponseDTO;
 import ru.itsrv23.coursework2.exception.NotFoundLimitQuestionsException;
 import ru.itsrv23.coursework2.exception.NotFoundQuestionException;
 import ru.itsrv23.coursework2.exception.QuestionAddException;
+import ru.itsrv23.coursework2.exception.QuestionMustBeUniqException;
 import ru.itsrv23.coursework2.model.Exam;
 import ru.itsrv23.coursework2.model.Question;
 import ru.itsrv23.coursework2.repository.ExamRepository;
@@ -14,6 +15,7 @@ import ru.itsrv23.coursework2.service.QuestionService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,14 +32,13 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
 
-
     @Override
     public Set<QuestionResponseDTO> findQuestions(Long examId, int amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("Число вопросов должно от 1 и более");
         }
         List<Question> allByExam = questionRepository.findByExamId(examId);
-        if (allByExam.size() < amount){
+        if (allByExam.size() < amount) {
             throw new NotFoundLimitQuestionsException("Нет достаточного количества вопросов: "
                     + amount + ", имеется: " + allByExam.size());
         }
@@ -52,20 +53,19 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionResponseDTO addQuestion(QuestionRequestDTO requestDTO) {
-        try {
-            Question save = questionRepository
-                    .save(newQuestion(requestDTO)
-                    );
-            return new QuestionResponseDTO(save);
-        } catch (RuntimeException runtimeException){
-            // может упасть потому что не соблюдается уникальность на уровне базы
-            // хорошо или плохо выносить логику на уровень базы под вопросом
-            // если эта таблица очень большая, каждый раз проверять если ли дубликат перед добавлением - больно
-            // o.h.engine.jdbc.spi.SqlExceptionHelper   : ОШИБКА: повторяющееся значение ключа нарушает ограничение уникальности "question_uniq_examid_question_answer"
-
-            // Так я могу пробросить 400, а не 500 ошибку
-            throw  new QuestionAddException();
+        System.out.println(requestDTO);
+        Optional<Question> firstByExamAndQuestionAndAnswerAndDeletedIsFalse = questionRepository.
+                findFirstByExamIdAndQuestionAndAnswerAndDeletedIsFalse(
+                requestDTO.getExamId(),
+                requestDTO.getQuestion(),
+                requestDTO.getAnswer()
+        );
+        if (firstByExamAndQuestionAndAnswerAndDeletedIsFalse.isPresent()) {
+            throw new QuestionMustBeUniqException();
         }
+
+        Question save = questionRepository.save(newQuestion(requestDTO));
+        return new QuestionResponseDTO(save);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class QuestionServiceImpl implements QuestionService {
         Question question = questionRepository.findById(id).orElseThrow(() -> new NotFoundQuestionException
                 (String.format("Question with id %d not found", id)));
 
-        if (question.isDeleted()){
+        if (question.isDeleted()) {
             throw new NotFoundQuestionException
                     (String.format("Question with id %d not found. Is Deleted", id));
         }
@@ -95,7 +95,7 @@ public class QuestionServiceImpl implements QuestionService {
         questionRepository.deleteById(id);
     }
 
-    protected Question newQuestion(QuestionRequestDTO requestDTO){
+    protected Question newQuestion(QuestionRequestDTO requestDTO) {
         Question question = new Question();
         question.setId(requestDTO.getId());
         question.setQuestion(requestDTO.getQuestion());

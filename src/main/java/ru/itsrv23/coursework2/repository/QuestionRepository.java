@@ -13,4 +13,5 @@ public interface QuestionRepository extends JpaRepository <Question, Long> {
     List<Question> findAll();
     List<Question> findAllByDeletedFalse();
     Optional<Question> findFirstByExamAndQuestionAndAnswer(Exam exam, String question, String answer);
+    Optional<Question> findFirstByExamIdAndQuestionAndAnswerAndDeletedIsFalse(Long examId, String question, String answer);
 }

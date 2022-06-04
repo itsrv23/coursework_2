@@ -9,6 +9,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.jdbc.Sql;
+import ru.itsrv23.coursework2.controller.constant.QuestionConstantTest;
 import ru.itsrv23.coursework2.controller.dto.QuestionRequestDTO;
 import ru.itsrv23.coursework2.controller.dto.QuestionResponseDTO;
 
@@ -48,16 +49,8 @@ class QuestionControllerWithTestRestTemplateTest {
     @Test
     @Sql(value = "/sql/create-exam-before.sql")
     void findQuestionById() {
-        QuestionResponseDTO expected = new QuestionResponseDTO();
-        expected.setId(1L);
-        expected.setQuestion("Вопрос 1");
-        expected.setAnswer("Ответ");
-        expected.setExamId(1L);
-        expected.setExamName("Java");
-
+        QuestionResponseDTO expected = QuestionConstantTest.expectedResponseDTOById1();
         QuestionResponseDTO actual = restTemplate.getForObject("http://localhost:" + port + "/question/1", QuestionResponseDTO.class);
-
-
         assertThat(expected).isEqualTo(actual);
         assertEquals(expected, actual);
     }
@@ -65,23 +58,9 @@ class QuestionControllerWithTestRestTemplateTest {
     @Test
     @Sql(value = "/sql/create-exam-before.sql")
     void addQuestion() {
-        QuestionRequestDTO requestDTO = new QuestionRequestDTO();
-        requestDTO.setId(0L);
-        requestDTO.setQuestion("you is ok?");
-        requestDTO.setAnswer("I am ok");
-        requestDTO.setExamId(1L);
-
+        QuestionRequestDTO requestDTO = QuestionConstantTest.requestDTO();
+        QuestionResponseDTO expected = QuestionConstantTest.expectedResponseDTO();
         QuestionResponseDTO actual = restTemplate.postForObject("http://localhost:" + port + "/question", requestDTO, QuestionResponseDTO.class);
-
-        System.out.println(actual.toString());
-
-        QuestionResponseDTO expected = new QuestionResponseDTO();
-        expected.setId(actual.getId());
-        expected.setQuestion("you is ok?");
-        expected.setAnswer("I am ok");
-        expected.setExamId(1L);
-        expected.setExamName("Java");
-
         assertThat(actual).isEqualTo(expected);
 
 
@@ -95,38 +74,17 @@ class QuestionControllerWithTestRestTemplateTest {
 
         String resourceUrl = "http://localhost:" + port + "/question";
 
-        String setQuestion = "Put.you is ok?";
-        String setAnswer = "Put.I am ok";
-        Long setExamId = 1L;
-
-        QuestionRequestDTO requestDTO = new QuestionRequestDTO();
-        requestDTO.setId(0L);
-        requestDTO.setQuestion(setQuestion);
-        requestDTO.setAnswer(setAnswer);
-        requestDTO.setExamId(setExamId);
+        QuestionRequestDTO requestDTO = QuestionConstantTest.requestDTO();
+        QuestionResponseDTO expected = QuestionConstantTest.expectedResponseDTO();
 
         HttpEntity<QuestionRequestDTO> questionRequestDTOHttpEntity = new HttpEntity<>(requestDTO);
 
         ResponseEntity<QuestionResponseDTO> exchange = restTemplate
                 .exchange(resourceUrl, HttpMethod.PUT, questionRequestDTOHttpEntity, QuestionResponseDTO.class);
-
+        System.out.println("exchange!!! " + exchange.getBody());
         assertThat(exchange.getStatusCodeValue()).isBetween(200,299);
-
-        QuestionResponseDTO expected = exchange.getBody();
-
-        System.out.println(exchange.getBody());
-
-        QuestionResponseDTO actual = new QuestionResponseDTO();
-        actual.setId(expected.getId()); // Берем ID так как генерит база
-        actual.setQuestion(setQuestion);
-        actual.setAnswer(setAnswer);
-        actual.setExamId(setExamId);
-        actual.setExamName("Java");
-
+        QuestionResponseDTO actual = exchange.getBody();
         assertEquals(actual, expected);
-
-
-
     }
 
     @Test
