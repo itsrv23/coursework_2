@@ -1,4 +1,5 @@
--- create database coursework2;
+-- Для отладки
+create database coursework2;
 
 CREATE TABLE IF NOT EXISTS public.exam (
                                            id BIGSERIAL NOT NULL,
@@ -44,8 +45,6 @@ COMMENT ON COLUMN public.question.answer
 COMMENT ON COLUMN public.question.deleted
     IS 'Удален';
 
-CREATE UNIQUE INDEX question_uniq_examid_question_answer ON public.question
-    USING btree ("question", "answer", "exam_id");
 
 ALTER TABLE public.question
     ADD CONSTRAINT question_fk FOREIGN KEY (exam_id)

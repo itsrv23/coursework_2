@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 @Primary
 public class QuestionServiceMultiExamImpl extends QuestionServiceImpl implements QuestionService {
 
-    public QuestionServiceMultiExamImpl(QuestionRepository questionRepository, ExamRepository examRepository) {
-        super(questionRepository, examRepository);
+    public QuestionServiceMultiExamImpl(QuestionRepository questionRepository) {
+        super(questionRepository);
     }
 
     @Override

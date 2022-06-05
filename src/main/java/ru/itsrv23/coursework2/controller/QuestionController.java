@@ -30,6 +30,7 @@ public class QuestionController {
 
     @PostMapping
     public QuestionResponseDTO addQuestion(@RequestBody QuestionRequestDTO requestDTO){
+        System.out.println("requestDTO in controller: " + requestDTO);
         return questionService.addQuestion(requestDTO);
     }
 

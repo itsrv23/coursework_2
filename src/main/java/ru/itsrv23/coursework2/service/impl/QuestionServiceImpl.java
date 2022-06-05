@@ -23,12 +23,10 @@ import java.util.stream.Collectors;
 public class QuestionServiceImpl implements QuestionService {
 
     protected final QuestionRepository questionRepository;
-    protected final ExamRepository examRepository;
 
 
-    public QuestionServiceImpl(QuestionRepository questionRepository, ExamRepository examRepository) {
+    public QuestionServiceImpl(QuestionRepository questionRepository) {
         this.questionRepository = questionRepository;
-        this.examRepository = examRepository;
     }
 
 
