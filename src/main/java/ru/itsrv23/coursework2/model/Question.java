@@ -76,14 +76,16 @@ public class Question {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Question question1 = (Question) o;
-        return deleted == question1.deleted && id.equals(question1.id) && question.equals(question1.question) && answer.equals(question1.answer) && exam.equals(question1.exam);
+        return deleted == question1.deleted
+                && question.equals(question1.question)
+                && answer.equals(question1.answer)
+                && exam.equals(question1.exam);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, question, answer, deleted, exam);
+        return Objects.hash(question, answer, deleted, exam);
     }
-
 
     @Override
     public String toString() {

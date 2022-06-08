@@ -55,12 +55,12 @@ public class QuestionRequestDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         QuestionRequestDTO that = (QuestionRequestDTO) o;
-        return Objects.equals(id, that.id) && Objects.equals(question, that.question) && Objects.equals(answer, that.answer) && Objects.equals(examId, that.examId);
+        return question.equals(that.question) && answer.equals(that.answer) && examId.equals(that.examId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, question, answer, examId);
+        return Objects.hash(question, answer, examId);
     }
 
     @Override

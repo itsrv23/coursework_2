@@ -9,8 +9,7 @@ public interface QuestionService {
 
     Set<QuestionResponseDTO> findQuestions(Long exam, int amount);
     QuestionResponseDTO addQuestion(QuestionRequestDTO question);
-    QuestionResponseDTO patchQuestion(QuestionRequestDTO question);
     QuestionResponseDTO findQuestionById(Long id);
-    void removeQuestion(Long id);
+    Long removeQuestion(Long id);
 
 }

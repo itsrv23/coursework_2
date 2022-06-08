@@ -42,9 +42,10 @@ public class QuestionServiceMultiExamImpl extends QuestionServiceImpl implements
     }
 
     @Override
-    public void removeQuestion(Long id) {
+    public Long removeQuestion(Long id) {
         Question question = questionRepository.findById(id).orElseThrow(NotFoundQuestionException::new);
         question.setDeleted(true);
         questionRepository.save(question);
+        return id;
     }
 }

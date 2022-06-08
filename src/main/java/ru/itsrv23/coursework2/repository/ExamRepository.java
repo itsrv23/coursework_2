@@ -6,5 +6,4 @@ import ru.itsrv23.coursework2.model.Exam;
 
 @Repository
 public interface ExamRepository extends JpaRepository<Exam, Long> {
-
 }

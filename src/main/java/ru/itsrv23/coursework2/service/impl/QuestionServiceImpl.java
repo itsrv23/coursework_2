@@ -51,7 +51,6 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionResponseDTO addQuestion(QuestionRequestDTO requestDTO) {
-        System.out.println(requestDTO);
         Optional<Question> firstByExamAndQuestionAndAnswerAndDeletedIsFalse = questionRepository.
                 findFirstByExamIdAndQuestionAndAnswerAndDeletedIsFalse(
                 requestDTO.getExamId(),
@@ -66,13 +65,6 @@ public class QuestionServiceImpl implements QuestionService {
         return new QuestionResponseDTO(save);
     }
 
-    @Override
-    public QuestionResponseDTO patchQuestion(QuestionRequestDTO question) {
-        // TODO:
-        //  Исправить на Patch, с частичным обновлением полей
-        Question save = questionRepository.save(newQuestion(question));
-        return new QuestionResponseDTO(save);
-    }
 
     @Override
     public QuestionResponseDTO findQuestionById(Long id) {
@@ -89,8 +81,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void removeQuestion(Long id) {
-        questionRepository.deleteById(id);
+    public Long removeQuestion(Long id) {
+         questionRepository.deleteById(id);
+        return id;
     }
 
     protected Question newQuestion(QuestionRequestDTO requestDTO) {

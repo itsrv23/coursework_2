@@ -1,6 +1,5 @@
 package ru.itsrv23.coursework2.controller;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import ru.itsrv23.coursework2.controller.dto.QuestionRequestDTO;
 import ru.itsrv23.coursework2.controller.dto.QuestionResponseDTO;
@@ -30,21 +29,12 @@ public class QuestionController {
 
     @PostMapping
     public QuestionResponseDTO addQuestion(@RequestBody QuestionRequestDTO requestDTO){
-        System.out.println("requestDTO in controller: " + requestDTO);
         return questionService.addQuestion(requestDTO);
     }
-
-    @PutMapping
-    public QuestionResponseDTO putQuestion(@RequestBody QuestionRequestDTO requestDTO){
-        return questionService.addQuestion(requestDTO);
-    }
-
-
-    // Дописать через patch
 
     @DeleteMapping({"{id}"})
-    public void removeQuestion(@PathVariable Long id){
-        questionService.removeQuestion(id);
+    public Long removeQuestion(@PathVariable Long id){
+        return questionService.removeQuestion(id);
     }
 
 }

@@ -1,10 +1,7 @@
 package ru.itsrv23.coursework2.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,73 +9,71 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.itsrv23.coursework2.controller.constant.QuestionConstantTest;
-import ru.itsrv23.coursework2.controller.dto.QuestionRequestDTO;
 import ru.itsrv23.coursework2.model.Question;
 import ru.itsrv23.coursework2.repository.QuestionRepository;
 import ru.itsrv23.coursework2.service.impl.QuestionServiceMultiExamImpl;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static ru.itsrv23.coursework2.controller.constant.ConstantTest.*;
 
 
 @WebMvcTest(controllers = QuestionController.class)
 class QuestionControllerWithMockMvcTest {
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private ObjectMapper objectMapper; // для получения json быстрее воспользоваться ObjectMapper objectMapper
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @MockBean
-    QuestionRepository questionRepository;
+    private QuestionRepository questionRepository;
 
     @SpyBean
-    QuestionServiceMultiExamImpl service;
+    private QuestionServiceMultiExamImpl service;
 
     @InjectMocks
-    QuestionController questionController;
+    private QuestionController questionController;
 
 
     @Test
     void findQuestions() throws Exception {
-        List<Question> questions = QuestionConstantTest.expectedListQuestion();
+        int countQuestions = 2;
+        List<Question> questions = getListQuestion();
 
         when(questionRepository.findAllByDeletedFalse()).thenReturn(questions);
-        mockMvc.perform(get("/question/1/2"))
+        mockMvc.perform(get("/question/1/" + countQuestions))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$", hasSize(2)));
+                .andExpect(jsonPath("$", hasSize(countQuestions)));
     }
 
     @Test
     void findQuestionById() throws Exception {
-        when(questionRepository.findById(1L)).thenReturn(QuestionConstantTest.expectedQuestion());
-        mockMvc.perform(get("/question/1"))
+
+        when(questionRepository.findById(QUESTION_ID1)).thenReturn(Optional.of(getQuestion_ID1()));
+
+        String json = objectMapper.writeValueAsString(getRequestDTO_ID1());
+
+        mockMvc.perform(get("/question/" + QUESTION_ID1))
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.question").value("You is ok?"));
+                .andExpect(content().json(json));
 
     }
 
     @Test
     void addQuestion() throws Exception {
-        Question question = QuestionConstantTest.expectedQuestion().get();
         // лучше использовать any, что бы не было проблем, с NPE
-        when(questionRepository.save(ArgumentMatchers.any(Question.class)))
-                .thenReturn(question);
+        when(questionRepository.save(any(Question.class))).thenReturn(getQuestion_ID1());
 
         when(questionRepository.
                 findFirstByExamIdAndQuestionAndAnswerAndDeletedIsFalse(anyLong(),
@@ -86,8 +81,7 @@ class QuestionControllerWithMockMvcTest {
                         anyString()))
                 .thenReturn(Optional.empty());
 
-        // для получения json быстрее воспользоваться ObjectMapper objectMapper
-        String json = objectMapper.writeValueAsString(QuestionConstantTest.requestDTO());
+        String json = objectMapper.writeValueAsString(getRequestDTO_ID1());
 
         mockMvc.perform(post("/question")
                         .content(json)
@@ -95,15 +89,13 @@ class QuestionControllerWithMockMvcTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(content().json(json));
-                // что бы не проверять по отдельным полям, можно проверить json == json
-                //.andExpect(jsonPath("$.question").value("You is ok?"));
 
         // тест на дубликаты, должна выкинуться ошибка
         when(questionRepository.
                 findFirstByExamIdAndQuestionAndAnswerAndDeletedIsFalse(anyLong(),
                         anyString(),
                         anyString()))
-                .thenReturn(Optional.of(question));
+                .thenReturn(Optional.of(getQuestion_ID1()));
 
         mockMvc.perform(post("/question")
                         .content(json)
@@ -114,15 +106,14 @@ class QuestionControllerWithMockMvcTest {
 
     }
 
-    @Ignore
     @Test
-    void putQuestion() {
-        // пока игнорим, метод дублирует POST
-    }
+    void removeQuestion() throws Exception {
+        Question question_id1 = getQuestion_ID1();
+        when(questionRepository.findById(anyLong())).thenReturn(Optional.of(getQuestion_ID1()));
+        question_id1.setDeleted(true);
+        when(questionRepository.save(any(Question.class))).thenReturn(question_id1);
 
-    @Ignore
-    @Test
-    void removeQuestion() {
-        // не придумал как тестировать void методы, без реальной базы
+        mockMvc.perform(delete("/question/" + QUESTION_ID1))
+                .andExpect(content().string(QUESTION_ID1.toString()));
     }
 }
